@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Game III</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+
+        .jump-game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .visualization-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .array-input, .start-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .array-input:focus, .start-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .array-visualization {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .array-element {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            padding: 12px 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .array-element.start {
+            background: #ffd700;
+            border-color: #ffb347;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .array-element.current {
+            background: #ff6b6b;
+            border-color: #ff5252;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+
+        .array-element.visited {
+            background: #90EE90;
+            border-color: #32CD32;
+        }
+
+        .array-element.target {
+            background: #4ecdc4;
+            border-color: #26a69a;
+            color: white;
+        }
+
+        .array-element.reachable {
+            background: #ffeb3b;
+            border-color: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        .element-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .element-index {
+            font-size: 12px;
+            color: #666;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .jump-arrows {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+        }
+
+        .arrow {
+            font-size: 12px;
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        .result-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .result-value.true {
+            color: #28a745;
+        }
+
+        .result-value.false {
+            color: #dc3545;
+        }
+
+        .path-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .path-step {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .path-arrow {
+            margin: 0 8px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .complexity-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .exploration-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .array-element {
+                min-width: 50px;
+                padding: 8px 6px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .step-controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-info {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        const App = () => {
+            return (
+                <div className="App">
+                    <JumpGame />
+                </div>
+            );
+        };
+
+        const JumpGame = () => {
+            const [arr, setArr] = React.useState([4, 2, 3, 0, 3, 1, 2]);
+            const [start, setStart] = React.useState(5);
+            const [arrayInput, setArrayInput] = React.useState('4,2,3,0,3,1,2');
+            const [startInput, setStartInput] = React.useState('5');
+            const [result, setResult] = React.useState(null);
+            const [isCalculating, setIsCalculating] = React.useState(false);
+            const [error, setError] = React.useState('');
+            const [path, setPath] = React.useState([]);
+            const [visited, setVisited] = React.useState(new Set());
+            const [currentStep, setCurrentStep] = React.useState(0);
+            const [explorationSteps, setExplorationSteps] = React.useState([]);
+            const [isVisualizing, setIsVisualizing] = React.useState(false);
+
+            const canReach = (arr, start) => {
+                const visited = new Set();
+                const steps = [];
+                const path = [];
+
+                const dfs = (index, currentPath) => {
+                    if (visited.has(index)) {
+                        steps.push({
+                            type: 'backtrack',
+                            index: index,
+                            message: `Already visited index ${index}, backtracking`,
+                            visited: new Set(visited),
+                            path: [...currentPath]
+                        });
+                        return false;
+                    }
+
+                    if (index < 0 || index >= arr.length) {
+                        steps.push({
+                            type: 'outOfBounds',
+                            index: index,
+                            message: `Index ${index} is out of bounds, backtracking`,
+                            visited: new Set(visited),
+                            path: [...currentPath]
+                        });
+                        return false;
+                    }
+
+                    visited.add(index);
+                    currentPath.push(index);
+
+                    steps.push({
+                        type: 'visit',
+                        index: index,
+                        value: arr[index],
+                        message: `Visiting index ${index} with value ${arr[index]}`,
+                        visited: new Set(visited),
+                        path: [...currentPath]
+                    });
+
+                    if (arr[index] === 0) {
+                        steps.push({
+                            type: 'found',
+                            index: index,
+                            message: `Found target! Index ${index} has value 0`,
+                            visited: new Set(visited),
+                            path: [...currentPath],
+                            success: true
+                        });
+                        return true;
+                    }
+
+                    const leftJump = index - arr[index];
+                    const rightJump = index + arr[index];
+
+                    steps.push({
+                        type: 'explore',
+                        index: index,
+                        leftJump: leftJump,
+                        rightJump: rightJump,
+                        message: `From index ${index}, can jump to ${leftJump} or ${rightJump}`,
+                        visited: new Set(visited),
+                        path: [...currentPath]
+                    });
+
+                    if (dfs(leftJump, [...currentPath])) {
+                        return true;
+                    }
+
+                    if (dfs(rightJump, [...currentPath])) {
+                        return true;
+                    }
+
+                    currentPath.pop();
+                    steps.push({
+                        type: 'backtrack',
+                        index: index,
+                        message: `No path found from index ${index}, backtracking`,
+                        visited: new Set(visited),
+                        path: [...currentPath]
+                    });
+
+                    return false;
+                };
+
+                const result = dfs(start, []);
+                return { result, steps };
+            };
+
+            const handleArrayInputChange = (e) => {
+                setArrayInput(e.target.value);
+            };
+
+            const handleStartInputChange = (e) => {
+                setStartInput(e.target.value);
+            };
+
+            const parseInputs = () => {
+                try {
+                    const parsedArray = arrayInput.split(',').map(num => {
+                        const trimmed = num.trim();
+                        if (trimmed === '') throw new Error('Empty value in array');
+                        const parsed = parseInt(trimmed);
+                        if (isNaN(parsed)) throw new Error(`"${trimmed}" is not a valid number`);
+                        if (parsed < 0) throw new Error('Array values must be non-negative');
+                        return parsed;
+                    });
+
+                    if (parsedArray.length === 0) throw new Error('Array cannot be empty');
+                    if (parsedArray.length > 50000) throw new Error('Array length must be <= 50000');
+
+                    for (let val of parsedArray) {
+                        if (val >= parsedArray.length) {
+                            throw new Error(`Value ${val} must be < array length (${parsedArray.length})`);
+                        }
+                    }
+
+                    const parsedStart = parseInt(startInput.trim());
+                    if (isNaN(parsedStart)) throw new Error('Start index must be a valid number');
+                    if (parsedStart < 0) throw new Error('Start index must be non-negative');
+                    if (parsedStart >= parsedArray.length) {
+                        throw new Error(`Start index must be < array length (${parsedArray.length})`);
+                    }
+
+                    return { array: parsedArray, startIndex: parsedStart };
+                } catch (err) {
+                    throw new Error(`Invalid input: ${err.message}`);
+                }
+            };
+
+            const calculateResult = async () => {
+                try {
+                    setError('');
+                    setIsCalculating(true);
+                    setResult(null);
+                    setPath([]);
+                    setVisited(new Set());
+                    setExplorationSteps([]);
+                    setCurrentStep(0);
+
+                    const { array, startIndex } = parseInputs();
+                    setArr(array);
+                    setStart(startIndex);
+
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    const { result, steps } = canReach(array, startIndex);
+
+                    setResult(result);
+                    setExplorationSteps(steps);
+
+                    if (result) {
+                        const successStep = steps.find(step => step.success);
+                        if (successStep) {
+                            setPath(successStep.path);
+                        }
+                    }
+
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsCalculating(false);
+                }
+            };
+
+            const visualizeStep = (stepIndex) => {
+                if (stepIndex >= 0 && stepIndex < explorationSteps.length) {
+                    setCurrentStep(stepIndex);
+                    const step = explorationSteps[stepIndex];
+                    setVisited(step.visited);
+                    if (step.success) {
+                        setPath(step.path);
+                    }
+                }
+            };
+
+            const resetVisualization = () => {
+                setCurrentStep(0);
+                setVisited(new Set());
+                setPath([]);
+                setIsVisualizing(false);
+            };
+
+            const loadExample = (exampleArray, exampleStart) => {
+                const arrayStr = exampleArray.join(',');
+                setArrayInput(arrayStr);
+                setStartInput(exampleStart.toString());
+                setArr(exampleArray);
+                setStart(exampleStart);
+                setResult(null);
+                setError('');
+                setPath([]);
+                setVisited(new Set());
+                setExplorationSteps([]);
+                setCurrentStep(0);
+                setIsVisualizing(false);
+            };
+
+            const getElementClass = (index) => {
+                let classes = 'array-element';
+
+                if (index === start && !isVisualizing) {
+                    classes += ' start';
+                }
+
+                if (isVisualizing && explorationSteps.length > 0) {
+                    const currentStepData = explorationSteps[currentStep];
+                    if (currentStepData && currentStepData.index === index) {
+                        classes += ' current';
+                    } else if (visited.has(index)) {
+                        classes += ' visited';
+                    }
+                } else if (path.includes(index)) {
+                    classes += ' visited';
+                }
+
+                if (arr[index] === 0) {
+                    classes += ' target';
+                }
+
+                return classes;
+            };
+
+            const getJumpTargets = (index) => {
+                if (index < 0 || index >= arr.length) return [];
+                const left = index - arr[index];
+                const right = index + arr[index];
+                const targets = [];
+                if (left >= 0 && left < arr.length) targets.push(left);
+                if (right >= 0 && right < arr.length) targets.push(right);
+                return targets;
+            };
+
+            return (
+                <div className="jump-game-container" data-testid="jump-game-container">
+                    <div className="header">
+                        <h1>Jump Game III</h1>
+                        <p>Find if you can reach any index with value 0</p>
+                    </div>
+
+                    <div className="main-content">
+                        <div className="input-section">
+                            <h2>Input Configuration</h2>
+
+                            <div className="input-group">
+                                <label htmlFor="array-input">
+                                    Array (comma-separated integers):
+                                </label>
+                                <input
+                                    id="array-input"
+                                    data-testid="array-input"
+                                    type="text"
+                                    value={arrayInput}
+                                    onChange={handleArrayInputChange}
+                                    placeholder="e.g., 4,2,3,0,3,1,2"
+                                    className="array-input"
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label htmlFor="start-input">
+                                    Start Index:
+                                </label>
+                                <input
+                                    id="start-input"
+                                    data-testid="start-input"
+                                    type="number"
+                                    value={startInput}
+                                    onChange={handleStartInputChange}
+                                    placeholder="e.g., 5"
+                                    className="start-input"
+                                    min="0"
+                                />
+                            </div>
+
+                            <div className="button-group">
+                                <button
+                                    data-testid="calculate-btn"
+                                    onClick={calculateResult}
+                                    disabled={isCalculating}
+                                    className="btn btn-primary"
+                                >
+                                    {isCalculating ? 'Calculating...' : 'Check Reachability'}
+                                </button>
+
+                                <button
+                                    data-testid="example1-btn"
+                                    onClick={() => loadExample([4, 2, 3, 0, 3, 1, 2], 5)}
+                                    className="btn btn-secondary"
+                                >
+                                    Example 1
+                                </button>
+
+                                <button
+                                    data-testid="example2-btn"
+                                    onClick={() => loadExample([4, 2, 3, 0, 3, 1, 2], 0)}
+                                    className="btn btn-secondary"
+                                >
+                                    Example 2
+                                </button>
+
+                                <button
+                                    data-testid="example3-btn"
+                                    onClick={() => loadExample([3, 0, 2, 1, 2], 2)}
+                                    className="btn btn-secondary"
+                                >
+                                    Example 3
+                                </button>
+                            </div>
+
+                            {error && (
+                                <div className="error-message" data-testid="error-message">
+                                    {error}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="visualization-section">
+                            <h2>Array Visualization</h2>
+
+                            <div className="legend">
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#ffd700', borderColor: '#ffb347'}}></div>
+                                    Start Position
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#ff6b6b', borderColor: '#ff5252'}}></div>
+                                    Current
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#90EE90', borderColor: '#32CD32'}}></div>
+                                    Visited
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#4ecdc4', borderColor: '#26a69a'}}></div>
+                                    Target (0)
+                                </div>
+                            </div>
+
+                            <div className="array-visualization" data-testid="array-visualization">
+                                {arr.map((num, index) => (
+                                    <div
+                                        key={index}
+                                        className={getElementClass(index)}
+                                        data-testid={`array-element-${index}`}
+                                    >
+                                        <div className="element-value">{num}</div>
+                                        <div className="element-index">{index}</div>
+                                        {isVisualizing && explorationSteps.length > 0 && explorationSteps[currentStep] && 
+                                         explorationSteps[currentStep].index === index && (
+                                            <div className="jump-arrows">
+                                                {getJumpTargets(index).map((target, i) => (
+                                                    <span key={i} className="arrow">
+                                                        {target < index ? '←' : '→'}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {explorationSteps.length > 0 && (
+                                <div className="step-controls">
+                                    <button
+                                        data-testid="prev-step-btn"
+                                        onClick={() => {
+                                            if (currentStep > 0) {
+                                                visualizeStep(currentStep - 1);
+                                            }
+                                        }}
+                                        disabled={currentStep === 0}
+                                        className="btn btn-secondary"
+                                    >
+                                        ← Prev
+                                    </button>
+
+                                    <div className="step-info">
+                                        Step {currentStep + 1} of {explorationSteps.length}
+                                    </div>
+
+                                    <button
+                                        data-testid="next-step-btn"
+                                        onClick={() => {
+                                            setIsVisualizing(true);
+                                            if (currentStep < explorationSteps.length - 1) {
+                                                visualizeStep(currentStep + 1);
+                                            }
+                                        }}
+                                        disabled={currentStep === explorationSteps.length - 1}
+                                        className="btn btn-success"
+                                    >
+                                        Next →
+                                    </button>
+
+                                    <button
+                                        data-testid="reset-btn"
+                                        onClick={resetVisualization}
+                                        className="btn btn-secondary"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {result !== null && (
+                        <div className="result-section fade-in" data-testid="result-section">
+                            <h2 className="result-title">
+                                🎯 Result
+                            </h2>
+                            <div className={`result-value ${result ? 'true' : 'false'}`} data-testid="result-value">
+                                {result ? 'TRUE - Can reach a zero!' : 'FALSE - Cannot reach any zero'}
+                            </div>
+
+                            {result && path.length > 0 && (
+                                <div className="path-section" data-testid="path-section">
+                                    <h3>Successful Path:</h3>
+                                    <div>
+                                        {path.map((index, i) => (
+                                            <React.Fragment key={index}>
+                                                <span className="path-step">
+                                                    Index {index} (value: {arr[index]})
+                                                </span>
+                                                {i < path.length - 1 && (
+                                                    <span className="path-arrow">→</span>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="complexity-info">
+                                <strong>Time Complexity:</strong> O(n) - Each index visited at most once<br/>
+                                <strong>Space Complexity:</strong> O(n) - Recursion stack and visited set<br/>
+                                <strong>Algorithm:</strong> Depth-First Search with backtracking
+                            </div>
+
+                            {explorationSteps.length > 0 && isVisualizing && (
+                                <div className="exploration-info" data-testid="exploration-info">
+                                    <strong>Current Step:</strong> {explorationSteps[currentStep]?.message || 'No message'}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

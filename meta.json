@@ -1,0 +1,141 @@
+{
+  "problemId": "1306",
+  "title": "Jump Game III",
+  "difficulty": "Medium",
+  "duration": "30-40 minutes",
+  "companies": [
+    "Amazon",
+    "Google",
+    "Microsoft",
+    "Facebook/Meta",
+    "Apple",
+    "Bloomberg",
+    "Adobe",
+    "Uber",
+    "LinkedIn",
+    "ByteDance",
+    "Salesforce",
+    "Netflix",
+    "Goldman Sachs",
+    "JPMorgan",
+    "Citadel",
+    "Two Sigma"
+  ],
+  "topicTags": [
+    "Array",
+    "Depth-First Search",
+    "Breadth-First Search",
+    "Graph",
+    "Recursion"
+  ],
+  "similarProblems": [
+    {
+      "id": "55",
+      "title": "Jump Game",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "45",
+      "title": "Jump Game II",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "1345",
+      "title": "Jump Game IV",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "1696",
+      "title": "Jump Game VI",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "1871",
+      "title": "Jump Game VII",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "200",
+      "title": "Number of Islands",
+      "difficulty": "Medium"
+    }
+  ],
+  "complexity": {
+    "timeComplexity": "O(n)",
+    "spaceComplexity": "O(n)",
+    "approach": "Depth-First Search"
+  },
+  "constraints": {
+    "arrayLength": {
+      "min": 1,
+      "max": 50000
+    },
+    "elementValue": {
+      "min": 0,
+      "max": "array.length - 1"
+    },
+    "startIndex": {
+      "min": 0,
+      "max": "array.length - 1"
+    }
+  },
+  "keyInsights": [
+    "Bidirectional movement makes this a graph traversal problem",
+    "DFS or BFS can solve this effectively",
+    "Visited tracking prevents infinite loops",
+    "Early termination when any zero is found",
+    "Boundary checking is crucial for array access"
+  ],
+  "interviewFrequency": {
+    "overall": "High",
+    "byCompany": {
+      "FAANG": "High",
+      "BigTech": "High",
+      "Startups": "Medium",
+      "Finance": "Medium"
+    }
+  },
+  "skillLevel": {
+    "algorithmDesign": "Medium",
+    "implementation": "Medium",
+    "optimization": "Easy",
+    "edgeCases": "Medium"
+  },
+  "commonMistakes": [
+    "Not tracking visited positions leading to infinite loops",
+    "Incorrect boundary checking for array access",
+    "Using wrong search strategy (BFS when DFS is simpler)",
+    "Not handling edge cases like single elements",
+    "Forgetting bidirectional movement capability",
+    "Stack overflow with deep recursion on large inputs"
+  ],
+  "interviewTips": {
+    "clarifyingQuestions": [
+      "Can I jump in both directions from any position?",
+      "What happens if I start at an index with value 0?",
+      "Are there any constraints on the array values?",
+      "Should I find the shortest path or any path?",
+      "Can the array contain duplicate values?"
+    ],
+    "testCases": [
+      "Single element with zero: [0], start=0",
+      "Single element without zero: [1], start=0",
+      "No zeros in array: [1,2,3], start=0",
+      "Multiple zeros: [0,1,0], start=1",
+      "Unreachable zero: [3,0,1], start=2",
+      "Large jumps: [4,0,1,2,3], start=0"
+    ],
+    "optimizations": [
+      "Early termination when zero found",
+      "Iterative implementation for large inputs",
+      "Bidirectional search from start and zeros"
+    ]
+  },
+  "realWorldApplications": [
+    "Maze solving algorithms",
+    "Network connectivity checking",
+    "Game pathfinding systems",
+    "Social network analysis",
+    "Circuit connectivity verification"
+  ]
+}
